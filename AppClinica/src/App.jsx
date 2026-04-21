@@ -1,11 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
-// Estruturas
-import { LinkedList } from './data-structures/LinkedList'
-import { Queue } from './data-structures/Queue'
-import { Stack } from './data-structures/Stack'
-import { measureTime, bubbleSort, quickSort } from './utils/sorting'
+// Estruturas de Dados migraram para o backend Python (FastAPI).
+// Em breve faremos requisições via fetch/axios para a API.
 
 // Componentes
 import { PatientsList } from './components/PatientsList'
@@ -14,10 +11,8 @@ import { MedicalConsultation } from './components/MedicalConsultation'
 import { Dashboard } from './components/Dashboard'
 
 function App() {
-  // Use Refs para manter as instâncias verdadeiras das estruturas
-  const linkedList = useRef(new LinkedList());
-  const triageQueue = useRef(new Queue());
-  const historyStack = useRef(new Stack());
+  // Removido: Instâncias locais das estruturas de dados JS
+  // Agora essas listas e filas serão mantidas no backend Python.
 
   // Estados apenas para renderização e métricas
   const [patients, setPatients] = useState([]);
@@ -48,85 +43,41 @@ function App() {
 
   // --- Funções da Lista (Cadastro) ---
   const handleAddPatient = (data) => {
-    linkedList.current.append(data);
-    setPatients(linkedList.current.toArray());
-    updateMetrics();
+    // TODO: Enviar POST para o backend Python (/patients)
+    alert("Função temporariamente desativada: O backend Python foi criado e em breve será conectado!");
   };
 
   const handleSearch = (id) => {
-    const { result, time } = measureTime(() => linkedList.current.searchById(id));
-    updateMetrics({ searchTime: time, searchFound: !!result });
-    if (result) {
-      alert(`Paciente encontrado: ${result.name} - ${result.age} anos`);
-    } else {
-      alert("Paciente não encontrado!");
-    }
+    // TODO: Fazer GET para o backend Python (/patients/{id})
+    alert("Função temporariamente desativada: O backend Python será conectado em breve.");
   };
 
   const handleSort = (type) => {
-    const arr = linkedList.current.toArray();
-    let sortedArr = [];
-    let time = 0;
-
-    if (type === 'bubble') {
-      const res = measureTime(() => bubbleSort(arr, 'id'));
-      sortedArr = res.result;
-      time = res.time;
-    } else {
-      const res = measureTime(() => quickSort(arr, 'id'));
-      sortedArr = res.result;
-      time = res.time;
-    }
-
-    linkedList.current.fromArray(sortedArr);
-    setPatients(linkedList.current.toArray());
-    updateMetrics({
-      sortTime: time,
-      lastSortAlgo: type === 'bubble' ? 'Bubble Sort' : 'Quick Sort'
-    });
+    // TODO: Fazer requisição para o backend Python realizar a ordenação
+    alert("Ordenação passará a ser processada no servidor Python.");
   };
 
   // --- Funções da Fila (Triagem) ---
   const handleEnqueue = () => {
-    if (patients.length === 0) return;
-    // Pega um paciente aleatório da lista para "chegar" na clínica
-    const randomPatient = patients[Math.floor(Math.random() * patients.length)];
-    triageQueue.current.enqueue(randomPatient);
-    setQueue(triageQueue.current.toArray());
-    updateMetrics();
+    // TODO: Fazer POST para /queue no backend Python
   };
 
   const handleDequeue = () => {
-    const p = triageQueue.current.dequeue();
-    if (p) {
-      setCurrentPatient(p);
-      historyStack.current = new Stack(); // reseta histórico para o novo paciente
-      setStack(historyStack.current.toArray());
-      setQueue(triageQueue.current.toArray());
-      updateMetrics();
-    }
+    // TODO: Fazer POST para /queue/dequeue no backend Python
   };
 
   // --- Funções da Pilha (Consulta) ---
   const handlePushAction = (desc) => {
-    historyStack.current.push(desc);
-    setStack(historyStack.current.toArray());
-    updateMetrics();
+    // TODO: Integrar com a API Python (/stack/push)
   };
 
   const handlePopAction = () => {
-    historyStack.current.pop();
-    setStack(historyStack.current.toArray());
-    updateMetrics();
+    // TODO: Integrar com a API Python (/stack/pop)
   };
 
   // Mock initial data if empty
   useEffect(() => {
-    if (linkedList.current.size === 0) {
-      handleAddPatient({ id: '9001', name: 'João Silva', age: 45 });
-      handleAddPatient({ id: '1023', name: 'Maria Souza', age: 32 });
-      handleAddPatient({ id: '5040', name: 'Carlos Santos', age: 58 });
-    }
+    // Aqui no futuro faremos um GET /patients para inicializar
   }, []);
 
   return (
